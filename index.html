@@ -1,0 +1,366 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allana — AI Video Portfolio</title>
+<meta name="description" content="AI-generated explainer videos: motion graphics, synced voiceover, and sound design.">
+<style>
+:root{
+  --bg: #0b0f14;
+  --bg-soft: #11161d;
+  --panel: #161d26;
+  --border: rgba(255,255,255,0.08);
+  --text: #eef1f5;
+  --text-dim: #a7b0bc;
+  --gold: #ffb648;
+  --gold-soft: #ffe6ad;
+  --sky: #4f92e8;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(255,182,72,0.12), transparent 60%),
+    radial-gradient(900px 500px at 10% 0%, rgba(79,146,232,0.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  line-height:1.5;
+}
+a{color:inherit;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+/* Nav */
+header.nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(11,15,20,0.72);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1080px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:0.2px;text-decoration:none;font-size:15px;}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%, var(--gold-soft), var(--gold) 60%, #d97f12);box-shadow:0 0 14px rgba(255,182,72,0.7);}
+nav.links{display:flex;gap:28px;font-size:14px;color:var(--text-dim);}
+nav.links a{text-decoration:none;transition:color .2s;}
+nav.links a:hover{color:var(--gold-soft);}
+
+/* Hero */
+.hero{padding:96px 0 64px;text-align:center;}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--gold-soft);
+  background:rgba(255,182,72,0.08);
+  border:1px solid rgba(255,182,72,0.25);
+  padding:6px 14px;border-radius:999px;
+  margin-bottom:24px;
+}
+.hero h1{
+  font-size:clamp(34px, 6vw, 60px);
+  line-height:1.08;
+  margin:0 0 18px;
+  font-weight:800;
+  letter-spacing:-0.02em;
+}
+.hero h1 .accent{
+  background:linear-gradient(90deg, var(--gold-soft), var(--gold) 55%, var(--sky));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero p{
+  max-width:560px;margin:0 auto;
+  color:var(--text-dim);
+  font-size:17px;
+}
+.hero-cta{margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:10px;
+  font-size:14px;font-weight:600;
+  text-decoration:none;
+  transition:transform .15s ease, background .2s ease, border-color .2s ease;
+  border:1px solid transparent;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{
+  background:linear-gradient(135deg, var(--gold), #f08a1c);
+  color:#1a1200;
+}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-ghost{
+  border-color:var(--border);
+  color:var(--text);
+  background:rgba(255,255,255,0.02);
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.22);}
+
+/* Section headings */
+.section{padding:72px 0;}
+.section-head{margin-bottom:36px;}
+.section-head .kicker{
+  font-size:12px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--gold-soft);font-weight:700;margin-bottom:10px;
+}
+.section-head h2{font-size:clamp(24px,3.4vw,34px);margin:0 0 10px;font-weight:800;letter-spacing:-0.01em;}
+.section-head p{color:var(--text-dim);max-width:560px;margin:0;font-size:15px;}
+
+/* Work grid */
+.work-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+  gap:28px;
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,182,72,0.35);box-shadow:0 18px 40px -18px rgba(0,0,0,0.6);}
+.media{
+  position:relative;
+  aspect-ratio:16/9;
+  background:#000;
+  overflow:hidden;
+}
+.media video{width:100%;height:100%;object-fit:cover;display:block;}
+.play-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(6,9,13,0.28);
+  cursor:pointer;
+  transition:background .2s ease, opacity .2s ease;
+}
+.play-overlay.hidden{opacity:0;pointer-events:none;}
+.play-btn{
+  width:60px;height:60px;border-radius:50%;
+  background:rgba(255,255,255,0.14);
+  border:1.5px solid rgba(255,255,255,0.6);
+  backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease, background .2s ease;
+}
+.media:hover .play-btn{transform:scale(1.08);background:rgba(255,255,255,0.22);}
+.play-btn svg{margin-left:3px;}
+.badge{
+  position:absolute;top:12px;right:12px;
+  font-size:11px;font-weight:700;letter-spacing:0.4px;
+  background:rgba(0,0,0,0.55);
+  border:1px solid rgba(255,255,255,0.15);
+  padding:4px 9px;border-radius:999px;
+  color:var(--gold-soft);
+}
+.card-body{padding:20px 22px 24px;flex:1;display:flex;flex-direction:column;}
+.card-body h3{margin:0 0 8px;font-size:18px;font-weight:700;}
+.card-body p{margin:0 0 16px;color:var(--text-dim);font-size:14px;flex:1;}
+.tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{
+  font-size:11.5px;font-weight:600;
+  color:var(--text-dim);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  padding:5px 10px;border-radius:999px;
+}
+
+/* Coming soon card */
+.card.placeholder{
+  align-items:center;justify-content:center;
+  text-align:center;
+  border-style:dashed;
+  color:var(--text-dim);
+  padding:40px 24px;
+  min-height:100%;
+}
+.card.placeholder .plus{
+  width:44px;height:44px;border-radius:50%;
+  border:1.5px dashed rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;font-size:20px;color:var(--gold-soft);
+}
+.card.placeholder h3{color:var(--text);font-size:16px;margin:0 0 6px;}
+.card.placeholder p{font-size:13px;margin:0;}
+
+/* Process */
+.process-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+  gap:24px;
+}
+.process-item{
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+}
+.process-item .icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,182,72,0.1);
+  border:1px solid rgba(255,182,72,0.25);
+  margin-bottom:16px;
+  color:var(--gold-soft);
+}
+.process-item h3{margin:0 0 8px;font-size:15px;font-weight:700;}
+.process-item p{margin:0;font-size:13.5px;color:var(--text-dim);}
+
+/* Contact */
+.contact{
+  text-align:center;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:56px 32px;
+}
+.contact h2{font-size:clamp(22px,3.2vw,30px);margin:0 0 12px;font-weight:800;}
+.contact p{color:var(--text-dim);margin:0 0 26px;font-size:15px;}
+
+footer{
+  padding:32px 0 48px;
+  text-align:center;
+  color:var(--text-dim);
+  font-size:13px;
+}
+footer a{color:var(--gold-soft);text-decoration:none;}
+
+@media (max-width:640px){
+  nav.links{gap:18px;font-size:13px;}
+  .hero{padding:72px 0 48px;}
+  .section{padding:52px 0;}
+}
+</style>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><span class="brand-dot"></span> Allana · AI Video</a>
+    <nav class="links">
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap" id="top">
+    <span class="eyebrow">✦ AI-generated video studio</span>
+    <h1>Explainers that turn <span class="accent">one idea</span> into one unforgettable visual.</h1>
+    <p>A portfolio of short, AI-produced videos — motion graphics, synced voiceover, and sound design, built fast and designed to make a single idea instantly clear.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#work">
+        View the work
+      </a>
+      <a class="btn btn-ghost" href="#contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section class="section wrap" id="work">
+    <div class="section-head">
+      <div class="kicker">Selected work</div>
+      <h2>Portfolio</h2>
+      <p>Each piece pairs one clear visual metaphor with narration and music, timed together beat for beat.</p>
+    </div>
+
+    <div class="work-grid">
+      <article class="card">
+        <div class="media" data-video-card>
+          <video
+            src="output/sunlight_benefits.mp4"
+            poster="images/sunlight_poster.jpg"
+            playsinline
+            preload="metadata"
+          ></video>
+          <div class="play-overlay" data-play-overlay>
+            <div class="play-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <span class="badge">0:08</span>
+        </div>
+        <div class="card-body">
+          <h3>Sunlight &amp; Health</h3>
+          <p>A rising sun charges a human silhouette like a battery, lighting up bone, mood, immunity, and energy benefits in sync with a narrated voiceover.</p>
+          <div class="tags">
+            <span class="tag">Motion graphics</span>
+            <span class="tag">Voiceover</span>
+            <span class="tag">Sound design</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="card placeholder">
+        <div>
+          <div class="plus">+</div>
+          <h3>More coming soon</h3>
+          <p>New explainer videos land here as they're produced.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="process">
+    <div class="section-head">
+      <div class="kicker">How it's made</div>
+      <h2>One metaphor, fully synced</h2>
+      <p>Every video is built from three layers that lock together on a shared timeline.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-item">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10a8 8 0 1 1 16 0v10"/><path d="M4 20h4M16 20h4"/></svg>
+        </div>
+        <h3>Script &amp; voice</h3>
+        <p>A short narration is written for the concept, then synthesized as a natural voiceover with precise word-level timing.</p>
+      </div>
+      <div class="process-item">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <h3>Motion design</h3>
+        <p>One strong visual metaphor is animated frame by frame, with every beat keyed to a moment in the narration.</p>
+      </div>
+      <div class="process-item">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <h3>Sound design</h3>
+        <p>A light, uplifting music bed is composited underneath and ducked automatically so the voice stays clear.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="contact">
+    <div class="contact">
+      <h2>Have an idea worth animating?</h2>
+      <p>Send over the concept and I'll turn it into a short, synced explainer video.</p>
+      <a class="btn btn-primary" href="mailto:allthingsallana@gmail.com">allthingsallana@gmail.com</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  &copy; <span id="year"></span> Allana. AI-generated video portfolio.
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  document.querySelectorAll('[data-video-card]').forEach(function (card) {
+    const video = card.querySelector('video');
+    const overlay = card.querySelector('[data-play-overlay]');
+
+    overlay.addEventListener('click', function () {
+      video.controls = true;
+      video.play();
+      overlay.classList.add('hidden');
+    });
+
+    video.addEventListener('pause', function () {
+      if (video.currentTime > 0 && !video.ended) overlay.classList.remove('hidden');
+    });
+    video.addEventListener('ended', function () {
+      overlay.classList.remove('hidden');
+    });
+  });
+</script>
