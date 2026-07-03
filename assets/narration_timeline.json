@@ -1,0 +1,47 @@
+{
+  "duration": 8.0,
+  "segments": [
+    {
+      "index": 0,
+      "text": "Sunlight energizes your body.",
+      "start": 0.08,
+      "duration": 1.882,
+      "end": 1.962
+    },
+    {
+      "index": 1,
+      "text": "Stronger bones.",
+      "start": 2.022,
+      "duration": 1.08,
+      "end": 3.102
+    },
+    {
+      "index": 2,
+      "text": "A brighter mood.",
+      "start": 3.162,
+      "duration": 0.894,
+      "end": 4.056
+    },
+    {
+      "index": 3,
+      "text": "Immune support.",
+      "start": 4.116,
+      "duration": 0.88,
+      "end": 4.995
+    },
+    {
+      "index": 4,
+      "text": "More energy.",
+      "start": 5.055,
+      "duration": 0.757,
+      "end": 5.812
+    },
+    {
+      "index": 5,
+      "text": "Just ten to fifteen minutes a day.",
+      "start": 5.872,
+      "duration": 1.959,
+      "end": 7.831
+    }
+  ]
+}

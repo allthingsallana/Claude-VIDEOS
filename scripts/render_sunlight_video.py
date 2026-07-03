@@ -5,6 +5,7 @@ Single visual metaphor: a rising sun's rays fill a human silhouette like a
 battery, glowing gold as it charges. Health-benefit icons light up at
 charge milestones (bones, mood, immunity, energy).
 """
+import json
 import math
 import os
 import subprocess
@@ -16,14 +17,22 @@ FPS = 24
 DURATION = 8.0
 N_FRAMES = int(FPS * DURATION)
 
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = "/tmp/claude-0/-home-user-Claude-VIDEOS/3b265bcc-4aa0-5fe6-8283-9333b736ebb4/scratchpad/frames"
-FINAL_VIDEO = "/home/user/Claude-VIDEOS/output/sunlight_benefits.mp4"
+SILENT_VIDEO = "/tmp/claude-0/-home-user-Claude-VIDEOS/3b265bcc-4aa0-5fe6-8283-9333b736ebb4/scratchpad/video_silent.mp4"
+AUDIO_MIX = os.path.join(REPO, "assets", "audio_mix.wav")
+TIMELINE_JSON = os.path.join(REPO, "assets", "narration_timeline.json")
+FINAL_VIDEO = os.path.join(REPO, "output", "sunlight_benefits.mp4")
 
 FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 FONT_REG = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(FINAL_VIDEO), exist_ok=True)
+
+with open(TIMELINE_JSON) as f:
+    NARRATION = json.load(f)["segments"]
+# segments: 0=title, 1..4=benefit icons, 5=CTA
 
 
 def lerp(a, b, t):
@@ -59,13 +68,18 @@ GREY = (90, 96, 108)
 GOLD_TOP = (255, 236, 150)
 GOLD_BOTTOM = (255, 170, 60)
 
-# Milestone icons: (fill_fraction_trigger, label, icon_kind)
+# Benefit icons keyed to narration segments 1-4, popping in as each is spoken.
 MILESTONES = [
-    (0.30, "Stronger Bones", "bone"),
-    (0.52, "Better Mood", "star"),
-    (0.74, "Immune Boost", "shield"),
-    (0.95, "More Energy", "bolt"),
+    (NARRATION[1]["start"], "Stronger Bones", "bone"),
+    (NARRATION[2]["start"], "Better Mood", "star"),
+    (NARRATION[3]["start"], "Immune Boost", "shield"),
+    (NARRATION[4]["start"], "More Energy", "bolt"),
 ]
+
+FILL_START = 0.3
+FILL_END = NARRATION[4]["end"] + 0.1  # fully charged by the end of "More energy"
+TITLE_START, TITLE_END = NARRATION[0]["start"], NARRATION[0]["end"] + 0.2
+CTA_START = NARRATION[5]["start"]
 
 
 def font(size, bold=True):
@@ -267,36 +281,36 @@ def render_frame(i):
     draw_sun_and_rays(img, draw, t, sx, sy)
     draw = ImageDraw.Draw(img)
 
-    fill_frac = ease(min(max((t - 0.4) / 6.0, 0.0), 1.0))
+    fill_frac = ease(min(max((t - FILL_START) / (FILL_END - FILL_START), 0.0), 1.0))
     draw_silhouette(img, fill_frac)
     draw = ImageDraw.Draw(img)
 
-    for frac, label, kind in MILESTONES:
-        if fill_frac >= frac - 0.02:
-            since = t - (0.4 + frac * 6.0)
-            pop = ease(min(max(since / 0.35, 0), 1)) if since > 0 else 0
-            if pop <= 0:
-                continue
-            idx = MILESTONES.index((frac, label, kind))
-            icon_x = W * 0.60
-            icon_y = H * 0.20 + idx * (H * 0.16)
-            scale = 0.6 + 0.4 * pop
-            alpha = int(255 * min(1.0, pop * 1.3))
-            draw_icon(draw, kind, icon_x, icon_y, scale, alpha)
-            text_with_alpha(
-                img, label, font(26), (icon_x + 42, icon_y), (255, 255, 255), alpha, anchor="lm"
-            )
-            draw = ImageDraw.Draw(img)
+    for idx, (start_t, label, kind) in enumerate(MILESTONES):
+        since = t - start_t
+        pop = ease(min(max(since / 0.35, 0), 1)) if since > 0 else 0
+        if pop <= 0:
+            continue
+        icon_x = W * 0.60
+        icon_y = H * 0.20 + idx * (H * 0.16)
+        scale = 0.6 + 0.4 * pop
+        alpha = int(255 * min(1.0, pop * 1.3))
+        draw_icon(draw, kind, icon_x, icon_y, scale, alpha)
+        text_with_alpha(
+            img, label, font(26), (icon_x + 42, icon_y), (255, 255, 255), alpha, anchor="lm"
+        )
+        draw = ImageDraw.Draw(img)
 
-    if t < 1.8:
-        a = ease(min(t / 0.5, 1.0)) * (1 - ease(max((t - 1.3) / 0.5, 0)))
+    if TITLE_START - 0.15 < t < TITLE_END:
+        a = ease(min((t - (TITLE_START - 0.15)) / 0.4, 1.0)) * (
+            1 - ease(max((t - (TITLE_END - 0.4)) / 0.4, 0))
+        )
         alpha = int(255 * max(0, a))
         text_with_alpha(
             img, "Sunlight = Vitamin D", font(52), (W / 2, H * 0.10), (255, 255, 255), alpha
         )
 
-    if t > 6.6:
-        a = ease(min((t - 6.6) / 0.5, 1.0))
+    if t > CTA_START:
+        a = ease(min((t - CTA_START) / 0.4, 1.0))
         alpha = int(255 * a)
         text_with_alpha(
             img,
@@ -325,6 +339,25 @@ def main():
             "libx264",
             "-pix_fmt",
             "yuv420p",
+            SILENT_VIDEO,
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            SILENT_VIDEO,
+            "-i",
+            AUDIO_MIX,
+            "-c:v",
+            "copy",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "192k",
+            "-shortest",
             "-movflags",
             "+faststart",
             FINAL_VIDEO,
